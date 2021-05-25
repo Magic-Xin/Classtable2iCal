@@ -6,13 +6,13 @@ async function genHeaderData(): Promise<string> {
     const dd: string = String(today.getDate()).padStart(2, '0');
     const mm: string = String(today.getMonth() + 1).padStart(2, '0');
     const yyyy: string = String(today.getFullYear());
-    const date: string = mm + '/' + dd + '/' + yyyy;
+    const date: string = yyyy + "-" + mm + "-" + dd;
 
     const CColor: string = "#ff9500";
 
     return 'BEGIN:VCALENDAR\n' +
         'VERSION:2.0\n' +
-        'X-WR-CALNAME:' + date + '\n' +
+        'X-WR-CALNAME:' + date + ' 课程表\n' +
         'X-APPLE-CALENDAR-COLOR:' + CColor + '\n' +
         'X-WR-TIMEZONE:Asia/Shanghai\n' +
         'BEGIN:VTIMEZONE\n' +

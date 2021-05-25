@@ -10,9 +10,9 @@ async function utc2String(date) {
     const dd = String(date.getDate()).padStart(2, '0');
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const yyyy = String(date.getFullYear());
-    const HH = String(date.getHours());
-    const MM = String(date.getMinutes());
-    const SS = String(date.getSeconds());
+    const HH = String(date.getHours()).padStart(2, '0');
+    const MM = String(date.getMinutes()).padStart(2, '0');
+    const SS = String(date.getSeconds()).padStart(2, '0');
     return yyyy + mm + dd + "T" + HH + MM + SS + "Z";
 }
 async function uuidv4() {
@@ -52,7 +52,7 @@ const weekdays = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 async function ical_generator (reqJson) {
     let iCalData = "";
     const first_week = reqJson["first_week"];
-    const dul_week = reqJson["dul_week"];
+    const dulWeek = reqJson["dul_week"];
     const inform_time = await inform_Time(reqJson["inform_time"]);
     const class_info = reqJson["class_info"];
     const utc_now = await utc2String(new Date(Date.now()));
@@ -67,7 +67,7 @@ async function ical_generator (reqJson) {
             time_table_first = reqJson["dul_time_table"].winter;
             time_table_second = reqJson["dul_time_table"].summer;
         }
-        iCalData = await dul_Timetable(iCalData, first_week, dulStart, dul_week, inform_time, class_info, time_table_first, time_table_second, utc_now);
+        iCalData = await dul_Timetable(iCalData, first_week, dulStart, dulWeek, inform_time, class_info, time_table_first, time_table_second, utc_now);
     }
     return iCalData;
 }
@@ -91,63 +91,58 @@ async function inform_Time(inform_time) {
         return "-P" + days + "DT" + hours + "H" + minutes + "M0S";
     }
 }
-async function dul_Timetable(iCalData, first_week, dulStart, dul_week, inform_time, class_info, time_table_first, time_table_second, utc_now) {
-    let extra_status = "1";
+async function dul_Timetable(iCalData, first_week, dulStart, dulWeek, inform_time, class_info, time_table_first, time_table_second, utc_now) {
     const initial_time = new Date(Date.parse(first_week));
     for (let i = 0; i < class_info.length; i++) {
+        let extra_status = "1";
         const obj = class_info[i];
         // first_time_table
         let delta_time = 7 * (obj.StartWeek - 1) + obj.Weekday - 1;
         if (obj.WeekStatus === 1) {
-            if (obj.WeekStatus % 2 === 0) {
+            if (obj.StartWeek % 2 === 0) {
                 delta_time += 7;
             }
         }
         else if (obj.WeekStatus === 2) {
-            if (obj.WeekStatus % 2 != 0) {
+            if (obj.StartWeek % 2 !== 0) {
                 delta_time += 7;
             }
         }
         delta_time *= 24 * 60 * 60 * 1000;
         const first_time_obj = new Date(initial_time.getTime() + delta_time);
-        if (obj.WeekStatus != 0) {
+        if (obj.WeekStatus !== 0) {
             extra_status = "2;BYDAY=" + weekdays[obj.Weekday - 1];
         }
         const final_stime_str = await date2String(first_time_obj) + "T" +
             String(time_table_first[obj.ClassStartTimeId].startTime);
         const final_etime_str = await date2String(first_time_obj) + "T" +
             String(time_table_first[obj.ClassEndTimeId].endTime);
-        let delta_week = 7 * (dul_week - obj.StartWeek - 1);
-        if ((obj.WeekStatus === 1 && dul_week % 2 === 1) || (obj.WeekStatus === 2 && dul_week % 2 === 0)) {
+        let delta_week = 7 * (dulWeek - obj.StartWeek - 1) + 1;
+        if ((obj.WeekStatus === 1 && dulWeek % 2 === 1) || (obj.WeekStatus === 2 && dulWeek % 2 === 0)) {
             delta_week -= 7;
         }
-        delta_week++;
         delta_week *= 24 * 60 * 60 * 1000;
         const stop_time_obj = new Date(first_time_obj.getTime() + delta_week);
         const stop_time_str = await utc2String(stop_time_obj);
         // second_time_table
-        let _delta_time = 7 * (dul_week - 1) + obj.Weekday - 1;
+        let _delta_time = 7 * (dulWeek - 1) + obj.Weekday - 1;
         if (obj.WeekStatus === 1) {
-            if (obj.WeekStatus % 2 === 0) {
+            if (dulWeek % 2 === 0) {
                 _delta_time += 7;
             }
         }
         else if (obj.WeekStatus === 2) {
-            if (obj.WeekStatus % 2 != 0) {
+            if (dulWeek % 2 !== 0) {
                 _delta_time += 7;
             }
         }
         _delta_time *= 24 * 60 * 60 * 1000;
         const _first_time_obj = new Date(initial_time.getTime() + _delta_time);
-        const _final_stime_str = await date2String(first_time_obj) + "T" +
+        const _final_stime_str = await date2String(_first_time_obj) + "T" +
             String(time_table_second[obj.ClassStartTimeId].startTime);
-        const _final_etime_str = await date2String(first_time_obj) + "T" +
+        const _final_etime_str = await date2String(_first_time_obj) + "T" +
             String(time_table_second[obj.ClassEndTimeId].endTime);
-        let _delta_week = 7 * (obj.EndWeek - dul_week);
-        if ((obj.WeekStatus === 1 && dul_week % 2 === 1) || (obj.WeekStatus === 2 && dul_week % 2 === 0)) {
-            _delta_week -= 7;
-        }
-        _delta_week++;
+        let _delta_week = 7 * (obj.EndWeek - dulWeek) + 1;
         _delta_week *= 24 * 60 * 60 * 1000;
         const _stop_time_obj = new Date(_first_time_obj.getTime() + _delta_week);
         const _stop_time_str = await utc2String(_stop_time_obj);
@@ -198,11 +193,11 @@ async function genHeaderData() {
     const dd = String(today.getDate()).padStart(2, '0');
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const yyyy = String(today.getFullYear());
-    const date = mm + '/' + dd + '/' + yyyy;
+    const date = yyyy + "-" + mm + "-" + dd;
     const CColor = "#ff9500";
     return 'BEGIN:VCALENDAR\n' +
         'VERSION:2.0\n' +
-        'X-WR-CALNAME:' + date + '\n' +
+        'X-WR-CALNAME:' + date + ' 课程表\n' +
         'X-APPLE-CALENDAR-COLOR:' + CColor + '\n' +
         'X-WR-TIMEZONE:Asia/Shanghai\n' +
         'BEGIN:VTIMEZONE\n' +

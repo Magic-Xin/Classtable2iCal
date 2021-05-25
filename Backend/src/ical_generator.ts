@@ -25,7 +25,7 @@ export default async function (reqJson: any): Promise<string> {
     let iCalData: string = "";
 
     const first_week: string = reqJson["first_week"];
-    const dul_week: number = reqJson["dul_week"];
+    const dulWeek: number = reqJson["dul_week"];
     const inform_time: string = await inform_Time(reqJson["inform_time"]);
     const class_info: class_info[] = reqJson["class_info"];
     const utc_now: string = await tools.utc2String(new Date(Date.now()));
@@ -41,7 +41,7 @@ export default async function (reqJson: any): Promise<string> {
             time_table_second = reqJson["dul_time_table"].summer;
         }
 
-        iCalData = await dul_Timetable(iCalData, first_week, dulStart, dul_week, inform_time, class_info,
+        iCalData = await dul_Timetable(iCalData, first_week, dulStart, dulWeek, inform_time, class_info,
             time_table_first, time_table_second, utc_now);
     }
 
@@ -68,29 +68,29 @@ async function inform_Time(inform_time: number): Promise<string> {
     }
 }
 
-async function dul_Timetable(iCalData: string, first_week: string, dulStart: number, dul_week: number,
+async function dul_Timetable(iCalData: string, first_week: string, dulStart: number, dulWeek: number,
                              inform_time: string, class_info: class_info[], time_table_first: time_table[],
                              time_table_second: time_table[], utc_now: string): Promise<string> {
-    let extra_status: string = "1";
     const initial_time: Date = new Date(Date.parse(first_week));
 
     for (let i: number = 0; i < class_info.length; i++) {
+        let extra_status: string = "1";
         const obj: class_info = class_info[i];
 
         // first_time_table
         let delta_time: number = 7 * (obj.StartWeek - 1) + obj.Weekday - 1;
         if (obj.WeekStatus === 1) {
-            if (obj.WeekStatus % 2 === 0) {
+            if (obj.StartWeek % 2 === 0) {
                 delta_time += 7;
             }
         } else if (obj.WeekStatus === 2) {
-            if (obj.WeekStatus % 2 != 0) {
+            if (obj.StartWeek % 2 !== 0) {
                 delta_time += 7;
             }
         }
         delta_time *= 24 * 60 * 60 * 1000;
         const first_time_obj: Date = new Date(initial_time.getTime() + delta_time);
-        if (obj.WeekStatus != 0) {
+        if (obj.WeekStatus !== 0) {
             extra_status = "2;BYDAY=" + weekdays[obj.Weekday - 1];
         }
 
@@ -98,23 +98,22 @@ async function dul_Timetable(iCalData: string, first_week: string, dulStart: num
             String(time_table_first[obj.ClassStartTimeId].startTime);
         const final_etime_str = await tools.date2String(first_time_obj) + "T" +
             String(time_table_first[obj.ClassEndTimeId].endTime);
-        let delta_week: number = 7 * (dul_week - obj.StartWeek - 1);
-        if ((obj.WeekStatus === 1 && dul_week % 2 === 1) || (obj.WeekStatus === 2 && dul_week % 2 === 0)) {
+        let delta_week: number = 7 * (dulWeek - obj.StartWeek - 1) + 1;
+        if ((obj.WeekStatus === 1 && dulWeek % 2 === 1) || (obj.WeekStatus === 2 && dulWeek % 2 === 0)) {
             delta_week -= 7;
         }
-        delta_week++;
         delta_week *= 24 * 60 * 60 * 1000;
         const stop_time_obj: Date = new Date(first_time_obj.getTime() + delta_week);
         const stop_time_str: string = await tools.utc2String(stop_time_obj);
 
         // second_time_table
-        let _delta_time: number = 7 * (dul_week - 1) + obj.Weekday - 1;
+        let _delta_time: number = 7 * (dulWeek - 1) + obj.Weekday - 1;
         if (obj.WeekStatus === 1) {
-            if (obj.WeekStatus % 2 === 0) {
+            if (dulWeek % 2 === 0) {
                 _delta_time += 7;
             }
         } else if (obj.WeekStatus === 2) {
-            if (obj.WeekStatus % 2 != 0) {
+            if (dulWeek % 2 !== 0) {
                 _delta_time += 7;
             }
         }
@@ -125,7 +124,7 @@ async function dul_Timetable(iCalData: string, first_week: string, dulStart: num
             String(time_table_second[obj.ClassStartTimeId].startTime);
         const _final_etime_str = await tools.date2String(_first_time_obj) + "T" +
             String(time_table_second[obj.ClassEndTimeId].endTime);
-        let _delta_week: number = 7 * (obj.EndWeek - dul_week);
+        let _delta_week: number = 7 * (obj.EndWeek - dulWeek) + 1;
         _delta_week *= 24 * 60 * 60 * 1000;
         const _stop_time_obj: Date = new Date(_first_time_obj.getTime() + _delta_week);
         const _stop_time_str: string = await tools.utc2String(_stop_time_obj);
