@@ -121,15 +121,11 @@ async function dul_Timetable(iCalData: string, first_week: string, dulStart: num
         _delta_time *= 24 * 60 * 60 * 1000;
         const _first_time_obj: Date = new Date(initial_time.getTime() + _delta_time);
 
-        const _final_stime_str = await tools.date2String(first_time_obj) + "T" +
+        const _final_stime_str = await tools.date2String(_first_time_obj) + "T" +
             String(time_table_second[obj.ClassStartTimeId].startTime);
-        const _final_etime_str = await tools.date2String(first_time_obj) + "T" +
+        const _final_etime_str = await tools.date2String(_first_time_obj) + "T" +
             String(time_table_second[obj.ClassEndTimeId].endTime);
         let _delta_week: number = 7 * (obj.EndWeek - dul_week);
-        if ((obj.WeekStatus === 1 && dul_week % 2 === 1) || (obj.WeekStatus === 2 && dul_week % 2 === 0)) {
-            _delta_week -= 7;
-        }
-        _delta_week++;
         _delta_week *= 24 * 60 * 60 * 1000;
         const _stop_time_obj: Date = new Date(_first_time_obj.getTime() + _delta_week);
         const _stop_time_str: string = await tools.utc2String(_stop_time_obj);
