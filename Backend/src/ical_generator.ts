@@ -43,7 +43,7 @@ export default async function (reqJson: any): Promise<string> {
 
         iCalData = await dul_Timetable(iCalData, first_week, dulStart, dulWeek, inform_time, class_info,
             time_table_first, time_table_second, utc_now);
-    } else  {
+    } else {
         const time_table: time_table[] = reqJson["time_table"];
         iCalData = await single_Timetable(iCalData, first_week, inform_time, class_info,
             time_table, utc_now);
@@ -239,5 +239,5 @@ async function single_Timetable(iCalData: string, first_week: string, inform_tim
 
     }
 
-        return iCalData;
+    return iCalData;
 }
