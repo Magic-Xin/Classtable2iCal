@@ -28,7 +28,7 @@ async function genHeaderData(): Promise<string> {
 }
 
 async function genEndData(): Promise<string> {
-    return "END:VCALENDAR";
+    return "\nEND:VCALENDAR";
 }
 
 async function checkMode(MODE: string): Promise<boolean> {

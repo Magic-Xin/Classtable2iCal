@@ -14,7 +14,7 @@ export default async function (total_weeks: number, first_week: string): Promise
         const end_date: string = await tools.date2String(end_date_obj);
 
         const ical_base =
-            "BEGIN:VEVENT\n" +
+            "\nBEGIN:VEVENT\n" +
             "CREATED:" + utc_now + "\n" +
             "DTSTAMP:" + utc_now + "\n" +
             "TZID:Asia/Shanghai\n" +

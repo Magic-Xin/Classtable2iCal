@@ -43,6 +43,10 @@ export default async function (reqJson: any): Promise<string> {
 
         iCalData = await dul_Timetable(iCalData, first_week, dulStart, dulWeek, inform_time, class_info,
             time_table_first, time_table_second, utc_now);
+    } else  {
+        const time_table: time_table[] = reqJson["time_table"];
+        iCalData = await single_Timetable(iCalData, first_week, inform_time, class_info,
+            time_table, utc_now);
     }
 
     return iCalData;
@@ -151,14 +155,14 @@ async function dul_Timetable(iCalData: string, first_week: string, dulStart: num
             alarm_base = "";
         }
 
-        const ical_base: string = "BEGIN:VEVENT\n" +
+        const ical_base: string = "\nBEGIN:VEVENT\n" +
             "CREATED:" + utc_now + "\nDTSTAMP:" + utc_now + "\nSUMMARY:" + obj.ClassName + "\n" +
             "DESCRIPTION:" + teacher + serial + "\nLOCATION:" + obj.Classroom + "\n" +
             "TZID:Asia/Shanghai\nSEQUENCE:0\nUID:" + await tools.uuidv4() + "\nRRULE:FREQ=WEEKLY;UNTIL=" + stop_time_str +
             ";INTERVAL=" + extra_status + "\nDTSTART;TZID=Asia/Shanghai:" + final_stime_str +
             "\nDTEND;TZID=Asia/Shanghai:" + final_etime_str + "\nX-APPLE-TRAVEL-ADVISORY-BEHAVIOR:AUTOMATIC\n" + alarm_base +
             "END:VEVENT\n"
-        const _ical_base: string = "BEGIN:VEVENT\n" +
+        const _ical_base: string = "\nBEGIN:VEVENT\n" +
             "CREATED:" + utc_now + "\nDTSTAMP:" + utc_now + "\nSUMMARY:" + obj.ClassName + "\n" +
             "DESCRIPTION:" + teacher + serial + "\nLOCATION:" + obj.Classroom + "\n" +
             "TZID:Asia/Shanghai\nSEQUENCE:0\nUID:" + await tools.uuidv4() + "\nRRULE:FREQ=WEEKLY;UNTIL=" + _stop_time_str +
@@ -169,4 +173,71 @@ async function dul_Timetable(iCalData: string, first_week: string, dulStart: num
         iCalData += ical_base + _ical_base;
     }
     return iCalData;
+}
+
+async function single_Timetable(iCalData: string, first_week: string, inform_time: string, class_info: class_info[],
+                                time_table: time_table[], utc_now: string): Promise<string> {
+    const initial_time: Date = new Date(Date.parse(first_week));
+
+    for (let i: number = 0; i < class_info.length; i++) {
+        let extra_status: string = "1";
+        const obj: class_info = class_info[i];
+
+        let delta_time: number = 7 * (obj.StartWeek - 1) + obj.Weekday - 1;
+        if (obj.WeekStatus === 1) {
+            if (obj.StartWeek % 2 === 0) {
+                delta_time += 7;
+            }
+        } else if (obj.WeekStatus === 2) {
+            if (obj.StartWeek % 2 !== 0) {
+                delta_time += 7;
+            }
+        }
+        delta_time *= 24 * 60 * 60 * 1000;
+        const first_time_obj: Date = new Date(initial_time.getTime() + delta_time);
+        if (obj.WeekStatus !== 0) {
+            extra_status = "2;BYDAY=" + weekdays[obj.Weekday - 1];
+        }
+
+        const final_stime_str = await tools.date2String(first_time_obj) + "T" +
+            String(time_table[obj.ClassStartTimeId].startTime);
+        const final_etime_str = await tools.date2String(first_time_obj) + "T" +
+            String(time_table[obj.ClassEndTimeId].endTime);
+        let delta_week: number = 7 * (obj.EndWeek - obj.StartWeek) + 1;
+        delta_week *= 24 * 60 * 60 * 1000;
+        const stop_time_obj: Date = new Date(first_time_obj.getTime() + delta_week);
+        const stop_time_str: string = await tools.utc2String(stop_time_obj);
+
+        let teacher: string, serial: string;
+        if (obj.Teacher != undefined) {
+            teacher = "教师：" + obj.Teacher + "\t";
+        } else {
+            teacher = "";
+        }
+        if (obj.ClassSerial != undefined) {
+            serial = "课程序号：" + obj.ClassSerial;
+        } else {
+            serial = "";
+        }
+
+        // Generate Alarm trigger
+        let alarm_base: string;
+        if (inform_time) {
+            alarm_base = "BEGIN:VALARM\nACTION:DISPLAY\nDESCRIPTION:This is an event reminder\n" +
+                "TRIGGER:" + inform_time + "\nX-WR-ALARMUID:" + await tools.uuidv4() + "\nUID:" + await tools.uuidv4() + "\nEND:VALARM\n";
+        } else {
+            alarm_base = "";
+        }
+
+        iCalData += "\nBEGIN:VEVENT\n" +
+            "CREATED:" + utc_now + "\nDTSTAMP:" + utc_now + "\nSUMMARY:" + obj.ClassName + "\n" +
+            "DESCRIPTION:" + teacher + serial + "\nLOCATION:" + obj.Classroom + "\n" +
+            "TZID:Asia/Shanghai\nSEQUENCE:0\nUID:" + await tools.uuidv4() + "\nRRULE:FREQ=WEEKLY;UNTIL=" + stop_time_str +
+            ";INTERVAL=" + extra_status + "\nDTSTART;TZID=Asia/Shanghai:" + final_stime_str +
+            "\nDTEND;TZID=Asia/Shanghai:" + final_etime_str + "\nX-APPLE-TRAVEL-ADVISORY-BEHAVIOR:AUTOMATIC\n" + alarm_base +
+            "END:VEVENT\n"
+
+    }
+
+        return iCalData;
 }
