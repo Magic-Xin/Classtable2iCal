@@ -1,5 +1,7 @@
 # Classtable2iCal Backend
 
+后端代码实现参考了 [SunsetYe66/ClasstableToIcal](https://github.com/SunsetYe66/ClasstableToIcal)，在此表示感谢
+
 ## 工作目录结构
 
 ```
