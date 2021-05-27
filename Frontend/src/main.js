@@ -1,12 +1,11 @@
 import Vue from 'vue';
+import Stepper from './Stepper.vue';
 import MuseUI from 'muse-ui';
 import 'muse-ui/dist/muse-ui.css';
 
 Vue.use(MuseUI);
+Vue.config.productionTip = false;
 
 new Vue({
-    el: '#app',
-    render (h) {
-        return h('mu-button', {}, 'Hello World');
-    }
-});
+    render: h => h(Stepper)
+  }).$mount("#app");
