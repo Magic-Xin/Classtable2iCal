@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import Stepper from './Stepper.vue';
+//import Stepper from './Stepper.vue';
+import Bar from "@/Bar";
 import MuseUI from 'muse-ui';
 import 'muse-ui/dist/muse-ui.css';
 
@@ -7,5 +8,8 @@ Vue.use(MuseUI);
 Vue.config.productionTip = false;
 
 new Vue({
-    render: h => h(Stepper)
-  }).$mount("#app");
+    el: '#app',
+    render (h) {
+        return h(Bar);
+    }
+});

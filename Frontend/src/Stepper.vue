@@ -2,18 +2,18 @@
   <div class="demo-step-container">
     <mu-stepper :active-step="activeStep">
       <mu-step>
-        <mu-step-label> 选择活动地点 </mu-step-label>
+        <mu-step-label> 选择活动地点</mu-step-label>
       </mu-step>
       <mu-step>
-        <mu-step-label> 创建一个群组 </mu-step-label>
+        <mu-step-label> 创建一个群组</mu-step-label>
       </mu-step>
       <mu-step>
-        <mu-step-label> 宣传活动 </mu-step-label>
+        <mu-step-label> 宣传活动</mu-step-label>
       </mu-step>
     </mu-stepper>
     <div class="demo-step-content">
       <p v-if="finished">
-        都完成啦!<a href="javascript:;" @click="reset">点这里</a>可以重置
+        都完成啦!<a href="javascript:" @click="reset">点这里</a>可以重置
       </p>
       <template v-if="!finished">
         <p>
@@ -21,17 +21,17 @@
         </p>
         <div>
           <mu-button
-            flat
-            class="demo-step-button"
-            :disabled="activeStep === 0"
-            @click="handlePrev"
+              flat
+              class="demo-step-button"
+              :disabled="activeStep === 0"
+              @click="handlePrev"
           >
             上一步
           </mu-button>
           <mu-button
-            class="demo-step-button"
-            color="primary"
-            @click="handleNext"
+              class="demo-step-button"
+              color="primary"
+              @click="handleNext"
           >
             {{ activeStep === 2 ? "完成" : "下一步" }}
           </mu-button>
