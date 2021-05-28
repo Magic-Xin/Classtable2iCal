@@ -1,5 +1,5 @@
 import Vue from 'vue';
-//import Stepper from './Stepper.vue';
+//import Stepper from '@/Stepper';
 import Bar from "@/Bar";
 import MuseUI from 'muse-ui';
 import 'muse-ui/dist/muse-ui.css';
