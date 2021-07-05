@@ -23,3 +23,9 @@
 ## 部署
 
 将 dist/index.js 部署在 Cloudflare Workers 或同类型服务上即可，通过带有 JSON 的 POST 请求获取 iCal 文件
+
+## Curl
+
+```
+curl -X POST -d @simple.json -H 'Content-Type: application/json' test.yourname.workers.dev
+```

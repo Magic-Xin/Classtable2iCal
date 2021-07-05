@@ -13,25 +13,58 @@
             integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw"
             crossorigin="anonymous"
     />
+    <style>
+        div.mdui-row {
+            position: relative;
+            top: 30px;
+            left: 30px;
+        }
+    </style>
     <title>Index</title>
 </head>
+
 <body class="mdui-theme-primary-pink mdui-theme-accent-pink">
-    <div class="mdui-appbar mdui-shadow-10">
-        <div class="mdui-toolbar mdui-color-theme">
-            <a href="index.html" class="mdui-typo-headline">iClassTable</a>
-            <div class="mdui-toolbar-spacer"></div>
-            <a href="javascript:location.reload();" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">refresh</i></a>
+
+<div class="mdui-appbar mdui-shadow-10">
+    <div class="mdui-toolbar mdui-color-theme">
+        <a href="index.html" class="mdui-typo-headline">iClassTable</a>
+        <div class="mdui-toolbar-spacer"></div>
+        <a href="javascript:location.reload();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '刷新'}"><i
+                class="mdui-icon material-icons">refresh</i></a>
+        <a href="https://github.com/Magic-Xin/Classtable2iCal" class="mdui-btn mdui-btn-icon"
+           mdui-tooltip="{content: 'GitHub'}"><i class="mdui-icon material-icons">star</i></a>
+    </div>
+</div>
+
+<div class="mdui-row">
+
+    <div class="mdui-collapse-item">
+        <div class="mdui-col-xs-3">
+            <label class="mdui-radio">
+                <input type="radio" name="group1" checked/>
+                <i class="mdui-radio-icon"></i>
+                生成课程表
+            </label>
         </div>
     </div>
-    <div></div>
-    <div class="mdui-progress">
-        <div class="mdui-progress-determinate mdui-color-theme-a700" style="width: 30%;"></div>
+
+    <div class="mdui-col-xs-3">
+        <label class="mdui-radio">
+            <input type="radio" name="group1"/>
+            <i class="mdui-radio-icon"></i>
+            仅生成周数指示器
+        </label>
     </div>
+
+</div>
 
 <script
         src="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"
         integrity="sha384-gCMZcshYKOGRX9r6wbDrvF+TcCCswSHFucUzUPwka+Gr+uHgjlYvkABr95TCOz3A"
         crossorigin="anonymous"
 ></script>
+<script>
+
+</script>
 </body>
 </html>
